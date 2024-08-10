@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/nokusukun/faust/docgen"
 	"net/http"
 )
 
@@ -91,6 +92,21 @@ func (api *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+		}).Methods("GET")
+		api.Mux.HandleFunc("/docs.html", func(w http.ResponseWriter, r *http.Request) {
+			// TODO: rewrite this, this is a mess
+			jsonData, _ := json.MarshalIndent(api, "", "  ")
+			var apiDoc docgen.APIDoc
+			err := json.Unmarshal(jsonData, &apiDoc)
+			if err != nil {
+				fmt.Println("Error parsing JSON:", err)
+				return
+			}
+			html := docgen.GenerateHTML(apiDoc)
+
+			w.Header().Set("Content-Type", "text/html")
+			w.WriteHeader(200)
+			w.Write([]byte(html))
 		}).Methods("GET")
 		api.built = true
 	}
