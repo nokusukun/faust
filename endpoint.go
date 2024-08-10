@@ -60,6 +60,7 @@ func (e *Endpoint) Use(w http.ResponseWriter, r *http.Request) bool {
 		}
 		return false
 	}
+
 	return true
 }
 

@@ -29,7 +29,12 @@ func (api *API) Method(method, path string, handler func(e *Endpoint) http.Handl
 	api.Endpoints = append(api.Endpoints, endpoint)
 	return api.Mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if endpoint.Use(w, r) {
-			endpoint.httpHandler(w, r)
+			h := endpoint.httpHandler
+			// we want the middleware to be executed in reverse order
+			for i := len(endpoint.middlewares) - 1; i >= 0; i-- {
+				h = endpoint.middlewares[i](h).ServeHTTP
+			}
+			h(w, r)
 		}
 		go endpoint.Dispose(r)
 	}).Methods(method)
