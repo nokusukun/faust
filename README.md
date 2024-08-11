@@ -1,7 +1,7 @@
 # Faust
 
 
-`faust` is a net/http compatible router and middleware for that has FastAPI-like features. It provides a convenient way to define HTTP endpoints, handle requests, and validate parameters, all while offering automatic API documentation generation.
+`faust` is a net/http compatible router and middleware that has FastAPI-like features. It provides a convenient way to define HTTP endpoints, handle requests, and validate parameters, all while offering automatic API documentation generation.
 
 
 *This is still in prototyping stage*
