@@ -16,6 +16,18 @@ func (api *API) Post(path string, handler func(e *Endpoint) http.HandlerFunc) *m
 	return api.Method("POST", path, handler)
 }
 
+func (api *API) Put(path string, handler func(e *Endpoint) http.HandlerFunc) *mux.Route {
+	return api.Method("PUT", path, handler)
+}
+
+func (api *API) Patch(path string, handler func(e *Endpoint) http.HandlerFunc) *mux.Route {
+	return api.Method("PATCH", path, handler)
+}
+
+func (api *API) Delete(path string, handler func(e *Endpoint) http.HandlerFunc) *mux.Route {
+	return api.Method("DELETE", path, handler)
+}
+
 func (api *API) Method(method, path string, handler func(e *Endpoint) http.HandlerFunc) *mux.Route {
 	endpoint := &Endpoint{
 		EndpointInfo: EndpointInfo{

@@ -37,7 +37,6 @@ func main() {
 		itemId := param.Path[string](e, "item_id", param.Info{
 			Description: "ID of the item, must start with item-",
 		})
-
 		q := param.Query[string](e, "q", param.Info{
 			Description: "Query string",
 		}).Optional()

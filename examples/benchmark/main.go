@@ -1,11 +1,11 @@
 package main
 
 import (
-	main2 "api-project-a"
-	"api-project-a/param"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/nokusukun/faust"
+	"github.com/nokusukun/faust/param"
 	"io"
 	"math/rand"
 	"net/http"
@@ -38,14 +38,14 @@ type Item struct {
 }
 
 func main() {
-	app := main2.New()
-	app.Get("/", func(e *main2.Endpoint) http.HandlerFunc {
+	app := faust.New()
+	app.Get("/", func(e *faust.Endpoint) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(`{"Hello": "World"}`))
 		}
 	})
 
-	app.Get("/items/{item_id}", func(e *main2.Endpoint) http.HandlerFunc {
+	app.Get("/items/{item_id}", func(e *faust.Endpoint) http.HandlerFunc {
 		itemId := param.Path[string](e, "item_id")
 		q := param.Query[string](e, "q")
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -55,9 +55,9 @@ func main() {
 
 	lock := sync.RWMutex{}
 	i := map[string]Item{}
-	app.Post("/items/{item_id}", func(e *main2.Endpoint) http.HandlerFunc {
+	app.Post("/items/{item_id}", func(e *faust.Endpoint) http.HandlerFunc {
 		itemId := param.Path[string](e, "item_id")
-		item := param.Json[Item](e, "item").Required()
+		item := param.Json[Item](e, "item")
 		return func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(time.Millisecond * time.Duration(rand.Intn(2000)))
 			lock.Lock()
@@ -67,7 +67,7 @@ func main() {
 		}
 	})
 
-	app.Get("/items/{item_id}/content", func(e *main2.Endpoint) http.HandlerFunc {
+	app.Get("/items/{item_id}/content", func(e *faust.Endpoint) http.HandlerFunc {
 		itemId := param.Path[string](e, "item_id")
 		return func(w http.ResponseWriter, r *http.Request) {
 			lock.RLock()
@@ -162,7 +162,7 @@ func Scream(i int) {
 func Benchmark() {
 	fmt.Println("Running benchmark in 1 sec")
 	time.Sleep(time.Second)
-	numWorkers := 2
+	numWorkers := 30
 	for i := 0; i < numWorkers; i++ {
 		go func() {
 			for i := 0; ; i++ {
