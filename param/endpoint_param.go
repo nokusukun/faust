@@ -11,6 +11,10 @@ import (
 	"strconv"
 )
 
+func reqToId(r *http.Request) string {
+	return fmt.Sprintf("%p", r)
+}
+
 func Query[T any](e *faust.Endpoint, name string, paramInfo ...Info) *EndpointParam[T] {
 	return Param[T]("query", e, name, paramInfo...)
 }
@@ -85,7 +89,8 @@ type EndpointParam[T any] struct {
 }
 
 func (e *EndpointParam[T]) Dispose(r *http.Request) {
-	e.values.Remove(fmt.Sprintf("%p", r))
+	reqId := reqToId(r)
+	e.values.Remove(reqId)
 }
 
 func (e *EndpointParam[T]) Validate(validateFunc ...func(T) error) *EndpointParam[T] {
@@ -116,11 +121,15 @@ func (e *EndpointParam[T]) Use(r *http.Request) error {
 			}
 		}
 	}
-	e.values.Set(fmt.Sprintf("%p", r), val)
+	e.values.Set(reqToId(r), val)
 	return nil
 }
 
 func (e *EndpointParam[T]) ValueWithError(r *http.Request) (T, error) {
+	if _, ok := e.values.Get(reqToId(r)); ok {
+		return e.Value(r), nil
+	}
+
 	var t T
 	var value string
 	switch e.parameterInfo.In {
